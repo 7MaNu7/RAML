@@ -1,0 +1,679 @@
+#%RAML 1.0
+title: API Rest MTIS
+version: v1
+baseUri: http://localhost:3000/api
+types:
+  cliente:
+    usage: Un usuario en el sistema
+    type: object
+    properties:
+      id:
+        description: Id único numérico para distinguir a un usuario
+        displayName: Id
+        type: integer
+        required: true
+        example: 1
+      dni:
+        description: DNI único del usuario
+        displayName: DNI
+        type: string
+        required: true
+        example: 48721162D
+      nombre:
+        description: Nombre del usuario
+        displayName: Nombre
+        type: string
+        required: true
+        example: Jorge
+      apellidos:
+        description: Apellidos del usuario
+        displayName: Apellidos
+        type: string
+        required: true
+        example: Azorín Martí
+      direccion:
+        description: Dirección del domicilio del usuario
+        displayName: Dirección
+        type: string
+        required: true
+        example: Avenida País Valenciano 92 1ºB
+      email:
+        description: Correo electrónico del usuario
+        displayName: Email
+        type: string
+        required: true
+        example: mjvr4@alu.ua.es
+  clientes:
+    usage: Lista de usuarios del sistema
+    type: array
+    items:
+      type: cliente
+      description: Un cliente del array de clientes
+      example:
+        {
+          id: 1,
+          dni: 48721162D,
+          nombre: Jorge,
+          apellidos: Azorín Martí,
+          direccion: Avenida País Valenciano 92 1ºB,
+          email: mjvr4@alu.ua.es
+        }
+      required: true
+  entradaEmail:
+    usage: Los parámetros de entrada de un email
+    type: object
+    properties:
+      idventa:
+        description: Identificador único para distinguir una venta concreta
+        displayName: Id de la venta
+        type: integer
+        required: true
+        example: 1
+      email:
+        description: Correo electrónico del usuario al que va dirigido
+        displayName: Email
+        type: string
+        required: true
+        example: mjvr4@alu.ua.es
+  tarjetaCredito:
+    usage: Los datos necesarios para pagar con tarjeta de crédito
+    type: object
+    properties:
+      numeroCuenta:
+        description: El número de la cuenta bancaria del usuario
+        displayName: Número primario
+        type: integer
+        required: true
+        example: 4895070000003551
+      fechaExpiracion:
+        description: Fecha de expiración de la tarjeta de crédito
+        displayName: Expira en
+        type: string
+        required: true
+        example: '2020-10'
+      cvv2:
+        description: Código de la tarjeta usado para autentificar
+        displayName: CVV2
+        type: integer
+        required: true
+        example: 022
+  entradaProductoPedido:
+    usage: Información de un producto necesaria para realizar pedido
+    type: object
+    properties:
+      id:
+        description: Identificador de producto
+        displayName: Id
+        type: integer
+        required: true
+        example: 1
+      cantidad:
+        description: Cantidad de unidades solicitada para un producto
+        displayName: Cantidad
+        type: integer
+        required: true
+        example: 5
+  entradaProductosPedido:
+    usage: Lista de productos seleccionados en un pedido
+    type: array
+    items:
+      type: entradaProductoPedido
+      description: Un producto del array de productos del pedido
+      example:
+        {
+          id: 1,
+          cantidad: 5
+        }
+      required: true
+  pedido:
+    usage: Datos requeridos para realizar un pedido
+    type: object
+    properties:
+      cliente:
+        description: Nombre del cliente que realiza el pedido
+        displayName: Cliente
+        type: string
+        required: true
+        example: Jorge
+      productos:
+        description: Lista de productos que se demandan en el pedido
+        displayName: Productos
+        type: entradaProductosPedido
+        required: true
+        example:
+          [{
+            id: 1,
+            cantidad: 5
+          }, {
+            id: 2,
+            cantidad: 8
+          }]
+  producto:
+    usage: Información de un producto
+    type: object
+    properties:
+      id:
+        description: Identificador de producto
+        displayName: Id
+        type: integer
+        required: true
+        example: 2
+      nombre:
+        description: Nombre del producto
+        displayName: Nombre
+        type: string
+        required: true
+        example: Tarta de chocolate
+      precio:
+        description: Precio del producto
+        displayName: Precio
+        type: number
+        required: true
+        example: 7.5
+      img:
+        description: Imagen descriptiva del producto
+        displayName: Imagen
+        type: string
+        required: true
+        example: http://pagina.com/imagendeprueba.jpg
+  productos:
+    usage: Listado de productos
+    type: array
+    items:
+      type: producto
+      description: Un producto del array de productos
+      example:
+        {
+          id: 1,
+          nombre: Tarta de chocolate,
+          precio: 7.5,
+          img: http://pagina.com/imagendeprueba.jpg
+        }
+      required: true
+  tienda:
+    usage: Información acerca de una tienda
+    type: object
+    properties:
+      id:
+        description: Identificador único numérico de la tienda en BD
+        displayName: Id
+        type: integer
+        required: true
+        example: 1
+      cif:
+        description: Identificador de la tienda
+        displayName: CIF
+        type: string
+        required: true
+        example: 223344551Q
+      nombre:
+        description: Nombre por el que se conoce a la tienda
+        displayName: Nombre
+        type: string
+        required: true
+        example: Almendro
+      descripcion:
+        description: Breve descripción de la tienda
+        displayName: Descripción
+        type: string
+        required: true
+        example: Franquicia en Torrevieja
+      direccion:
+        description: Dirección donde podemos encontrar la tienda
+        displayName: Dirección
+        type: string
+        required: true
+        example: Torrevieja Calle la Paz
+  tiendas:
+    usage: Listado de tiendas distribuidas
+    type: array
+    items:
+      type: tienda
+      description: Una tienda del array de tiendas
+      example:
+        {
+          id: 1,
+          cif: 223344551Q,
+          nombre: Almendro,
+          descripcion: Franquicia en Torrevieja,
+          direccion: Torrevieja Calle de la Paz
+        }
+      required: true
+  venta:
+    usage: Información de una venta
+    type: object
+    properties:
+      id:
+        description: Id único numérico para identificar a una venta
+        displayName: Id
+        type: integer
+        required: true
+        example: 1
+      preciototal:
+        description: Precio total incluyendo el precio de todos los productos vendidos
+        displayName: Precio total
+        type: number
+        required: true
+        example: 35.50
+      pagado:
+        description: Valor que nos dice si el pedido se ha pagado ya o no
+        displayName: ¿Se ha pagado el pedido?
+        type: boolean
+        required: true
+        example: true
+      tiendadistribuida:
+        description: Identificador de la tienda distribuida que hace la venta
+        displayName: Tienda distribuida
+        type: integer
+        required: true
+        example: 1
+  ventas:
+    usage: Listado de ventas de las tiendas distribuidas
+    type: array
+    items:
+      type: venta
+      description: Una venta del array de ventas
+      example:
+        {
+          id: 1,
+          preciototal: 35.50,
+          pagado: true,
+          tiendadistribuida: 1
+        }
+      required: true
+  ventaProductos:
+    usage: La venta con los respectivos productos y sus cantidades
+    type: object
+    properties:
+      productos:
+        description: Los productos y sus respectivas cantidades para una venta
+        displayName: Productos
+        type: entradaProductosPedido
+        required: true
+        example:
+          [{
+            id: 1,
+            cantidad: 5
+          }, {
+            id: 2,
+            cantidad: 8
+          }]
+      pagado:
+        description: Valor que nos dice si el pedido se ha pagado ya o no
+        displayName: ¿Se ha pagado el pedido?
+        type: boolean
+        required: true
+        example: true
+      tiendadistribuida:
+        description: Identificador de la tienda distribuida que hace la venta
+        displayName: Tienda distribuida
+        type: integer
+        required: true
+        example: 1
+  validarProductosTienda:
+    usage: Tenemos los productos así como su tienda origen para poder validarlos
+    type: object
+    properties:
+      productos:
+        description: Los productos y sus respectivas cantidades para una venta
+        displayName: Productos
+        type: entradaProductosPedido
+        required: true
+        example:
+          [{
+            id: 1,
+            cantidad: 5
+          }, {
+            id: 2,
+            cantidad: 8
+          }]
+      tienda:
+        description: Identificador de la tienda distribuida que hace la venta
+        displayName: Tienda distribuida
+        type: integer
+        required: true
+        example: 1
+
+
+/cliente:
+  get:
+    description: Obtener una lista completa de usuarios.
+    responses:
+      200:
+        body:
+          application/json:
+            type: clientes
+  /{client_id}:
+    get:
+      description: Obtener un cliente específico a través de su identificador.
+      responses:
+        200:
+          body:
+            application/json:
+              type: cliente
+        400:
+          body:
+            application/json:
+              example: |
+                {
+                  "El id debe ser numérico."
+                }
+        404:
+          body:
+            application/json:
+              example: |
+                {
+                  "Error. El cliente no existe."
+                }
+    /validar:
+      post:
+        description: Validar los datos de un cliente.
+        body:
+          application/json:
+            type: cliente
+        responses:
+          200:
+            body:
+              application/json:
+                example: |
+                  {
+                    "Cliente válido."
+                  }
+          400:
+            body:
+              application/json:
+                example: |
+                  {
+                    "El id debe ser numérico."
+                  }, {
+                    "Falta el campo dni, o su valor está vacío."
+                  }, {
+                    "El DNI no es válido."
+                  }, {
+                    "Son necesarios los campos nombre, apellidos, direccion y email."
+                  }
+          404:
+            body:
+              application/json:
+                example: |
+                  {
+                    "Error. El cliente no existe."
+                  }, {
+                    "Los datos del cliente no coinciden."
+                  }
+
+/email:
+  post:
+    description: Enviar un email a un cliente.
+    body:
+      application/json:
+        type: entradaEmail
+    responses:
+      200:
+        body:
+          application/json:
+            type: entradaEmail
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "Es necesario el campo email con la dirección de correo."
+              }, {
+                "Error, no se ha proporcionado el ID de la venta."
+              }
+      500:
+        body:
+          application/json:
+            example: |
+              {
+                "Error al enviar email."
+              }
+
+/pago:
+  post:
+    description: Comprobar y validar los datos de un pago
+    body:
+      application/json:
+        type: tarjetaCredito
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "Datos de tarjeta correctos."
+              }
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "Datos de tarjeta no válidos."
+              }
+      404:
+        body:
+          application/json:
+            example: |
+              {
+                "No se encuentra el keyFile"
+              }, {
+                "No se encuentra el certificateFile"
+              }
+
+/pedido:
+  post:
+    description: Crear y registrar un pedido del usuario
+    body:
+      application/json:
+        type: pedido
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "Pedido creado correctamente"
+              }
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "La petición debe tener un campo cliente (su nombre), y un campo productos."
+              }, {
+                "productos debe ser un array que contenga productos con forma {id: , cantidad: }"
+              }, {
+                "Los id de los productos y las cantidades deben ser numéricos."
+              }
+      404:
+        body:
+          application/json:
+            example: |
+              {
+                "Uno de los productos no existe"
+              }, {
+                "Ese cliente no existe para ese nombre."
+              }
+
+/productos:
+  get:
+    description: Obtener una lista de los productos
+    responses:
+      200:
+        body:
+          application/json:
+            type: productos
+      500:
+        body:
+          application/json:
+            example: |
+              {
+                "Error interno del servidor."
+              }
+
+/tiendas:
+  get:
+    description: Obtener una lista de las tiendas
+    responses:
+      200:
+        body:
+          application/json:
+            type: tiendas
+      500:
+        body:
+          application/json:
+            example: |
+              {
+                "Error interno del servidor."
+              }
+
+/venta:
+  get:
+    description: Obtener una lista de ventas
+    responses:
+      200:
+        body:
+          application/json:
+            type: ventas
+  post:
+    description: Registrar una venta en la base de datos
+    body:
+      application/json:
+        type: ventaProductos
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "Venta registrada sin problemas"
+              }
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "falta un atributo pagado: 0 o 1"
+              },
+              {
+                "pagado puede tener los valores 1 o 0"
+              }
+  /{id}:
+    get:
+      description: Obtener información de una venta
+      responses:
+        200:
+          body:
+            application/json:
+              type: venta
+        400:
+          body:
+            application/json:
+              example: |
+                {
+                  "El id debe ser numérico"
+                }
+        404:
+          body:
+            application/json:
+              example: |
+                {
+                  "El id debe ser numérico"
+                }
+    put:
+      description: Indicar si una venta ha sido pagada actualizando su información
+      body:
+        application/json:
+          example: |
+            {
+              "pagado": "true"
+            }
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "Venta actualizada"
+                }
+        400:
+          body:
+            application/json:
+              example: |
+                {
+                  "El id debe ser numérico"
+                }, {
+                  "falta un atributo pagado: 0 o 1"
+                }, {
+                  "pagado puede tener los valores 1 o 0"
+                }
+        404:
+          body:
+            application/json:
+              example: |
+                {
+                  "Esa venta no existe"
+                }
+    delete:
+      description: Borrar el registro de una venta
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "Venta borrada"
+                }
+        400:
+          body:
+            application/json:
+              example: |
+                {
+                  "El id debe ser numérico"
+                }
+        404:
+          body:
+            application/json:
+              example: |
+                {
+                  "Esa venta no existe"
+                }
+  /validardatos:
+    post:
+      description: Validar los datos de una venta
+      body:
+        application/json:
+          type: validarProductosTienda
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "Los datos de la venta son válidos"
+                }
+        400:
+          body:
+            application/json:
+              example: |
+                {
+                  "Los id de los productos y las cantidades deben ser numéricos."
+                }, {
+                  "La petición debe tener un campo tienda (su id), y un campo productos."
+                }, {
+                  "productos debe ser un array que contenga productos con forma {id: , cantidad: }"
+                }, {
+                  "Tienen que haber productos en la venta"
+                }, {
+                  "El campo tienda debe ser numérico"
+                }
+        404:
+          body:
+            application/json:
+              example: |
+                {
+                  "La tienda no existe"
+                }, {
+                  "Uno de los productos no existe"
+                }
